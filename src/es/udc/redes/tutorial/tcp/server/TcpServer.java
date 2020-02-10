@@ -1,44 +1,43 @@
 package es.udc.redes.tutorial.tcp.server;
 
+import java.io.IOException;
 import java.net.*;
-import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- * Monothread TCP echo server.
- */
+
 public class TcpServer {
 
+    @SuppressWarnings("empty-statement")
     public static void main(String argv[]) {
         if (argv.length != 1) {
             System.err.println("Format: TcpServer <port>");
             System.exit(-1);
         }
+        ServerSocket server=null;
         try {
             // Create a server socket
-            
+            server = new ServerSocket(Integer.parseInt(argv[0]));
             // Set a timeout of 300 secs
-            
+            server.setSoTimeout(300000);
             while (true) {
                 // Wait for connections
-                
-                // Set the input channel
-                
-                // Set the output channel
-                
-                // Receive the client message
-                
-                // Send response to the client
-
-                // Close the streams
+                Socket s = server.accept();
+                ServerThread t = new ServerThread(s);
+                t.run();
             }
         // Uncomment next catch clause after implementing the logic            
-        //} catch (SocketTimeoutException e) {
-        //    System.err.println("Nothing received in 300 secs ");
+        } catch (SocketTimeoutException e) {
+            System.err.println("Nothing received in 300 secs ");
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
-//Close the socket
+            try {
+              server.close();
+            } catch (IOException ex) {
+              Logger.getLogger(TcpServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

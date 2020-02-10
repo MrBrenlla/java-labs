@@ -12,19 +12,25 @@ public class UdpServer {
             System.err.println("Format: UdpServer <port_number>");
             System.exit(-1);
         }
+        DatagramSocket server=null;
         try {
             // Create a server socket
-            
+            server = new DatagramSocket(Integer.parseInt(argv[0]));
             // Set max. timeout to 300 secs
+            server.setSoTimeout(300000);
+            
             while (true) {
                 // Prepare datagram for reception
-                
+                byte buf[]=new byte[server.getSendBufferSize()];
+                DatagramPacket dp=new DatagramPacket(buf,server.getSendBufferSize());
                 // Receive the message
-                
+                server.receive(dp);
                 // Prepare datagram to send response
-                
+                DatagramPacket dp2;
+                dp2 = new DatagramPacket(dp.getData(),dp.getLength(),
+                        dp.getAddress(),dp.getPort());
                 // Send response
-                
+                server.send(dp2);
             }
           
         // Uncomment next catch clause after implementing the logic
@@ -34,7 +40,7 @@ public class UdpServer {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
-// Close the socket
+        if (!(server==null)) server.close();
         }
     }
 }
